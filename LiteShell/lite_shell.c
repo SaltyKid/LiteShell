@@ -60,6 +60,12 @@ void shell_main_task(void)
             }
             else if (('\n' == shell.curr_line.data[i] || '\r' == shell.curr_line.data[i]))
             {
+                if (((i + 1) < data_len) && ('\0' != shell.curr_line.data[i + 1]))
+                {
+                    if (('\n' == shell.curr_line.data[i + 1] ||
+                         '\r' == shell.curr_line.data[i + 1]))
+                        i += 1;
+                }
                 param_cnt++;
                 break;
             }
@@ -110,7 +116,8 @@ void shell_handler(const char *data_buf, uint32_t data_len)
         {
             shell.curr_line.data[shell.curr_line.len] = data_buf[i];
             shell.curr_line.len += 1;
-            if (('\n' == data_buf[i]) || (CONFIG_SHELL_MAX_LINE_LEN <= shell.curr_line.len))
+            if (('\r' == data_buf[i]) || ('\n' == data_buf[i]) ||
+                (CONFIG_SHELL_MAX_LINE_LEN <= shell.curr_line.len))
             {
                 if ('\n' != shell.curr_line.data[CONFIG_SHELL_MAX_LINE_LEN - 1])
                     shell.curr_line.data[CONFIG_SHELL_MAX_LINE_LEN - 1] = '\0';
@@ -154,8 +161,9 @@ void shell_help(int argc, char *argv[])
     {
         SHELL_DISPLAY("%-10s -- %s \r\n",
                       shell_command_list[i].name,
-                      ((void *)0 == shell_command_list[i].description ? shell_command_list[i].name
-                                                              : shell_command_list[i].description));
+                      ((void *)0 == shell_command_list[i].description
+                           ? shell_command_list[i].name
+                           : shell_command_list[i].description));
         i++;
     }
 }
