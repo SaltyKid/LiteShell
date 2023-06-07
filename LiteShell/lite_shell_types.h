@@ -60,6 +60,8 @@ extern "C" {
 #define SHELL_DISPLAY(fmt, args...)
 #endif
 
+#define LITE_SHELL_VERSION "0.1.0"
+
 /*============================= ENUM DEFINES ================================*/
 
 typedef enum SHELL_NUM_TYPE_ENUM
@@ -96,7 +98,7 @@ typedef struct SHELL_MONITOR_STRU
     struct
     {
         uint32_t len;
-        char data[CONFIG_SHELL_MAX_LINE_LEN];
+        char data[CONFIG_SHELL_MAX_LINE_LEN + 1];
     } curr_line;
     char argsbuf[CONFIG_SHELL_MAX_ARGS_NUM][CONFIG_SHELL_MAX_ARG_LEN + 1];
     char *argv[CONFIG_SHELL_MAX_ARGS_NUM];

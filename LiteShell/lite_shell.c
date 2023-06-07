@@ -91,7 +91,7 @@ void shell_main_task(void)
             }
             else
             {
-                SHELL_DISPLAY(CONFIG_SHELL_USER_NAME "~$ ");
+                SHELL_DISPLAY(CONFIG_SHELL_USER_NAME "~$ \r\n");
             }
         }
     }
@@ -119,8 +119,7 @@ void shell_handler(const char *data_buf, uint32_t data_len)
             if (('\r' == data_buf[i]) || ('\n' == data_buf[i]) ||
                 (CONFIG_SHELL_MAX_LINE_LEN <= shell.curr_line.len))
             {
-                if ('\n' != shell.curr_line.data[CONFIG_SHELL_MAX_LINE_LEN - 1])
-                    shell.curr_line.data[CONFIG_SHELL_MAX_LINE_LEN - 1] = '\0';
+                shell.curr_line.data[CONFIG_SHELL_MAX_LINE_LEN] = '\0';
                 shell.state = SHELL_NEW_CMD;
             }
         }
@@ -157,6 +156,7 @@ void shell_help(int argc, char *argv[])
     (void)argc;
     (void)argv;
 
+    SHELL_DISPLAY("LiteShell " LITE_SHELL_VERSION " 1035183478@qq.com \r\n");
     while ((void *)0 != shell_command_list[i].name)
     {
         SHELL_DISPLAY("%-10s -- %s \r\n",
