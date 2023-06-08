@@ -89,10 +89,7 @@ void shell_main_task(void)
             {
                 p_func(param_cnt, shell.argv);
             }
-            else
-            {
-                SHELL_DISPLAY(CONFIG_SHELL_USER_NAME "~$ ");
-            }
+            SHELL_DISPLAY(CONFIG_SHELL_USER_NAME "~$ ");
         }
     }
 }
@@ -166,7 +163,6 @@ void shell_help(int argc, char *argv[])
                            : shell_command_list[i].description));
         i++;
     }
-    SHELL_DISPLAY(CONFIG_SHELL_USER_NAME "~$ ");
 }
 
 /******************************************************************************
