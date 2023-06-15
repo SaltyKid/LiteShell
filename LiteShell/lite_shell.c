@@ -47,8 +47,7 @@ void shell_main_task(void)
         shell_init();
     if (SHELL_NEW_CMD == shell.state)
     {
-        data_len = shell.curr_line.len > CONFIG_SHELL_MAX_LINE_LEN ? CONFIG_SHELL_MAX_LINE_LEN
-                                                                   : shell.curr_line.len;
+        data_len = shell.curr_line.len;
         memset(shell.argsbuf, 0, sizeof(shell.argsbuf));
         for (i = 0; (0 != shell.curr_line.data[i]) && (i < data_len); i++)
         {
