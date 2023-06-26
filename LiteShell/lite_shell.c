@@ -338,8 +338,12 @@ static size_t shell_ext_parsenum(char *p_arg)
     uint8_t radix = 10, offset = 0;
     char *p = p_arg;
     char sign = 1;
-    size_t value_int = 0, devide = 0;
-    float value_float = 0.0;
+    size_t devide = 0;
+    union
+    {
+        size_t int_val;
+        float flt_val;
+    } num;
 
     if (*p_arg == '-')
     {
@@ -369,7 +373,7 @@ static size_t shell_ext_parsenum(char *p_arg)
     }
 
     p = p_arg + offset + ((sign == -1) ? 1 : 0);
-
+    num.int_val = 0;
     while (*p)
     {
         if (*p == '.')
@@ -378,18 +382,18 @@ static size_t shell_ext_parsenum(char *p_arg)
             p++;
             continue;
         }
-        value_int = value_int * radix + shell_ext_tonum(*p);
+        num.int_val = num.int_val * radix + shell_ext_tonum(*p);
         devide *= 10;
         p++;
     }
     if (type == NUM_TYPE_FLOAT && devide != 0)
     {
-        value_float = (float)value_int / (float)devide * sign;
-        return *(size_t *)&value_float;
+        num.flt_val = (float)num.int_val / (float)devide * sign;
+        return num.int_val;
     }
     else
     {
-        return value_int * sign;
+        return num.int_val * sign;
     }
 }
 

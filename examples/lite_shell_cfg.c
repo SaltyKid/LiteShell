@@ -88,6 +88,13 @@ static void shell_test_num(int argc, char *argv[])
  ******************************************************************************/
 static void shell_test_float(int argc, char *argv[])
 {
-    uint32_t ff = shell_arg_parse(argv[1]);
-    SHELL_LOG("shell get float { %f } \r\n", *(float *)&ff);
+    (void)argc;
+    union
+    {
+        size_t int_val;
+        float flt_val;
+    } num;
+
+    num.int_val = shell_arg_parse(argv[1]);
+    SHELL_LOG("shell get float { %f } \r\n", num.flt_val);
 }

@@ -60,7 +60,7 @@ extern "C" {
 #define SHELL_DISPLAY(fmt, args...)
 #endif
 
-#define LITE_SHELL_VERSION "0.1.0"
+#define LITE_SHELL_VERSION "0.1.1"
 
 /*============================= ENUM DEFINES ================================*/
 
