@@ -343,7 +343,7 @@ static size_t shell_ext_parsenum(char *p_arg)
     {
         size_t int_val;
         float flt_val;
-    } num;
+    } num = {0};
 
     if (*p_arg == '-')
     {
@@ -373,7 +373,6 @@ static size_t shell_ext_parsenum(char *p_arg)
     }
 
     p = p_arg + offset + ((sign == -1) ? 1 : 0);
-    num.int_val = 0;
     while (*p)
     {
         if (*p == '.')
@@ -386,6 +385,7 @@ static size_t shell_ext_parsenum(char *p_arg)
         devide *= 10;
         p++;
     }
+
     if (type == NUM_TYPE_FLOAT && devide != 0)
     {
         num.flt_val = (float)num.int_val / (float)devide * sign;
