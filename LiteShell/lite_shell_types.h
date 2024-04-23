@@ -28,6 +28,9 @@ extern "C" {
 #include <stdint.h>
 #include "lite_shell_cfg.h"
 
+/*========================= PERIPHERAL DECLARATION ==========================*/
+#define LITE_SHELL_VERSION "0.2.0"
+
 /*============================ TYPE DEFINITIONS =============================*/
 
 /*!< the max bytes limit for a cmd line */
@@ -50,6 +53,21 @@ extern "C" {
 #define CONFIG_SHELL_USER_NAME "SalyKid:"
 #endif
 
+/*!< lite shell cmd register mode */
+#ifndef CONFIG_SHELL_USE_REGISTER_MODE
+#define CONFIG_SHELL_USE_REGISTER_MODE 0
+#endif
+
+#if (0 != CONFIG_SHELL_USE_REGISTER_MODE)
+#ifndef CONFIG_SHELL_CMD_TBL_START_ADDR
+#define CONFIG_SHELL_CMD_TBL_START_ADDR 0
+#endif
+
+#ifndef CONFIG_SHELL_CMD_TBL_END_ADDR
+#define CONFIG_SHELL_CMD_TBL_END_ADDR 0
+#endif
+#endif
+
 /*!< lite shell public print */
 #ifndef SHELL_LOG
 #define SHELL_LOG(fmt, args...)
@@ -59,8 +77,6 @@ extern "C" {
 #ifndef SHELL_DISPLAY
 #define SHELL_DISPLAY(fmt, args...)
 #endif
-
-#define LITE_SHELL_VERSION "0.1.1"
 
 /*============================= ENUM DEFINES ================================*/
 
@@ -84,14 +100,6 @@ typedef enum SHELL_STATE_ENUM
 } SHELL_STATE_EM;
 
 /*=========================== STRUCTURE DEFINES =============================*/
-
-typedef struct SHELL_CMD_TYPE_STRU
-{
-    const char *name;
-    void (*func)(int argc, char *argv[]);
-    const char *description;
-} SHELL_CMD_TYPE_ST;
-
 typedef struct SHELL_MONITOR_STRU
 {
     SHELL_STATE_EM state;
@@ -105,7 +113,6 @@ typedef struct SHELL_MONITOR_STRU
 } SHELL_MONITOR_ST;
 
 /*============================ GLOBAL VARIABLES =============================*/
-extern const SHELL_CMD_TYPE_ST shell_command_list[];
 
 #ifdef __cplusplus
 }

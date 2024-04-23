@@ -27,6 +27,38 @@ extern "C" {
 /*============================= INCLUDE FILES ================================*/
 #include <stdint.h>
 #include <stddef.h>
+#include "lite_shell_cfg.h"
+
+/*=========================== STRUCTURE DEFINES =============================*/
+
+typedef struct SHELL_CMD_TYPE_STRU
+{
+    const char *name;
+    void (*func)(int argc, char *argv[]);
+    const char *description;
+} SHELL_CMD_TYPE_ST, lsh_tbl_t;
+
+/*============================= EXPORTED MACRO ===============================*/
+#if defined(__TASKING__)
+#define CMD_LINK_ENTRY_DECLARE(_section, _class, _type, _id)                   \
+    _type lsh##_##_id                                                          \
+        __attribute__((protect, section("." #_section "." #_class "." #_id)))
+#elif (defined(__ghs__) || defined(__GNUC__))
+#define CMD_LINK_ENTRY_DECLARE(_section, _class, _type, _id)                   \
+    _type lsh##_##_id                                                          \
+        __attribute__((section("." #_section "." #_class "." #_id)))
+#else
+#define CMD_LINK_ENTRY_DECLARE(_section, _class, _type, _id)
+#endif
+
+#define CMD_MKENT_COMPLETE(_cmd, _callback, _help_info)                        \
+    {                                                                          \
+        (char *)#_cmd, _callback, (char *)_help_info                           \
+    }
+
+#define SHELL_CMD_REGISTER(_cmd, _callback, _help_info)                        \
+    CMD_LINK_ENTRY_DECLARE(rodata, lite_shell, lsh_tbl_t, _cmd) =           \
+        CMD_MKENT_COMPLETE(_cmd, _callback, _help_info)
 
 /*========================== FUNCTION PROTOTYPES =============================*/
 

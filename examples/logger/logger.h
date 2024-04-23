@@ -36,10 +36,13 @@ extern "C" {
 #endif
 
 /*============================= EXPORTED MACRO ===============================*/
-#define LOG(...) printf(__VA_ARGS__)
+#define LOG(...)                                                               \
+    do                                                                         \
+    {                                                                          \
+        printf(__VA_ARGS__);                                                   \
+        fflush(stdout);                                                        \
+    } while (0);
 
-// #define LOG_I(fmt, a...) LOG("%8s %4d %-8s (I) " fmt, FILE_NAME(__FILE__), __LINE__,
-// __FUNCTION__, ##a)
 #define LOG_I(fmt, a...) LOG("I " fmt, ##a)
 #define LOG_D(fmt, a...) LOG("D " fmt, ##a)
 #define LOG_W(fmt, a...) LOG("W " fmt, ##a)

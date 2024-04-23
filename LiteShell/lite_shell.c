@@ -24,12 +24,16 @@
 #include <string.h>
 
 /*============================ GLOBAL VARIABLES =============================*/
+#if (0 == CONFIG_SHELL_USE_REGISTER_MODE)
+extern const lsh_tbl_t shell_command_list[];
+#endif
 static SHELL_MONITOR_ST shell = {
     .state = SHELL_UNINIT,
 };
 
 /*========================== FUNCTION PROTOTYPES ============================*/
-static void (*(shell_find_callback(const char *cmd_name)))(int argc, char *argv[]);
+static void (*(shell_find_callback(const char *cmd_name)))(int argc,
+                                                           char *argv[]);
 
 /*******************************************************************************
  * @brief        lite shell main processing function
@@ -51,15 +55,18 @@ void shell_main_task(void)
         memset(shell.argsbuf, 0, sizeof(shell.argsbuf));
         for (i = 0; (0 != shell.curr_line.data[i]) && (i < data_len); i++)
         {
-            if ((' ' == shell.curr_line.data[i]) || ('\t' == shell.curr_line.data[i]) ||
+            if ((' ' == shell.curr_line.data[i]) ||
+                ('\t' == shell.curr_line.data[i]) ||
                 (',' == shell.curr_line.data[i]))
             {
                 buf_idx = 0;
                 param_cnt++;
             }
-            else if (('\n' == shell.curr_line.data[i] || '\r' == shell.curr_line.data[i]))
+            else if (('\n' == shell.curr_line.data[i] ||
+                      '\r' == shell.curr_line.data[i]))
             {
-                if (((i + 1) < data_len) && ('\0' != shell.curr_line.data[i + 1]))
+                if (((i + 1) < data_len) &&
+                    ('\0' != shell.curr_line.data[i + 1]))
                 {
                     if (('\n' == shell.curr_line.data[i + 1] ||
                          '\r' == shell.curr_line.data[i + 1]))
@@ -71,7 +78,8 @@ void shell_main_task(void)
             else
             {
                 if (CONFIG_SHELL_MAX_ARG_LEN > buf_idx)
-                    shell.argsbuf[param_cnt][buf_idx++] = shell.curr_line.data[i];
+                    shell.argsbuf[param_cnt][buf_idx++] =
+                        shell.curr_line.data[i];
             }
 
             if (CONFIG_SHELL_MAX_ARGS_NUM <= param_cnt)
@@ -135,7 +143,8 @@ void shell_init(void)
 {
     uint32_t i = 0;
 
-    for (i = 0; i < CONFIG_SHELL_MAX_ARGS_NUM; i++) shell.argv[i] = shell.argsbuf[i];
+    for (i = 0; i < CONFIG_SHELL_MAX_ARGS_NUM; i++)
+        shell.argv[i] = shell.argsbuf[i];
     shell.state = SHELL_INIT_OK;
 }
 
@@ -148,10 +157,11 @@ void shell_init(void)
  ******************************************************************************/
 void shell_help(int argc, char *argv[])
 {
-    uint32_t i = 0;
     (void)argc;
     (void)argv;
+    uint32_t i = 0;
 
+#if (0 == CONFIG_SHELL_USE_REGISTER_MODE)
     SHELL_DISPLAY("LiteShell " LITE_SHELL_VERSION " 1035183478@qq.com \r\n");
     while ((void *)0 != shell_command_list[i].name)
     {
@@ -162,6 +172,21 @@ void shell_help(int argc, char *argv[])
                            : shell_command_list[i].description));
         i++;
     }
+#else
+    uint32_t cmd_items = ((uint32_t)(CONFIG_SHELL_CMD_TBL_END_ADDR) -
+                          (uint32_t)(CONFIG_SHELL_CMD_TBL_START_ADDR)) /
+                         sizeof(lsh_tbl_t);
+    const lsh_tbl_t *shell_command_list =
+        (lsh_tbl_t *)(CONFIG_SHELL_CMD_TBL_END_ADDR);
+    for (i = 0; i < cmd_items; i++)
+    {
+        SHELL_DISPLAY("%-10s -- %s \r\n",
+                      shell_command_list[i].name,
+                      ((void *)0 == shell_command_list[i].description
+                           ? shell_command_list[i].name
+                           : shell_command_list[i].description));
+    }
+#endif
 }
 
 /******************************************************************************
@@ -171,20 +196,41 @@ void shell_help(int argc, char *argv[])
  *
  * @return       p_func: a function pointer
  ******************************************************************************/
-static void (*(shell_find_callback(const char *cmd_name)))(int argc, char *argv[])
+static void (*(shell_find_callback(const char *cmd_name)))(int argc,
+                                                           char *argv[])
 {
     uint32_t i = 0;
     void (*p_func)(int argc, char *argv[]) = (void *)0;
 
+#if (0 == CONFIG_SHELL_USE_REGISTER_MODE)
     while ((void *)0 != shell_command_list[i].name)
     {
-        if (0 == strncmp(cmd_name, shell_command_list[i].name, CONFIG_SHELL_MAX_ARG_LEN))
+        if (0 == strncmp(cmd_name,
+                         shell_command_list[i].name,
+                         CONFIG_SHELL_MAX_ARG_LEN))
         {
             p_func = shell_command_list[i].func;
             break;
         }
         i++;
     }
+#else
+    uint32_t cmd_items = ((uint32_t)(CONFIG_SHELL_CMD_TBL_END_ADDR) -
+                          (uint32_t)(CONFIG_SHELL_CMD_TBL_START_ADDR)) /
+                         sizeof(lsh_tbl_t);
+    const lsh_tbl_t *shell_command_list =
+        (lsh_tbl_t *)(CONFIG_SHELL_CMD_TBL_END_ADDR);
+    for (i = 0; i < cmd_items; i++)
+    {
+        if (0 == strncmp(cmd_name,
+                         shell_command_list[i].name,
+                         CONFIG_SHELL_MAX_ARG_LEN))
+        {
+            p_func = shell_command_list[i].func;
+            break;
+        }
+    }
+#endif
 
     return p_func;
 }

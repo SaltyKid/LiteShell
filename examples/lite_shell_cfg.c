@@ -24,12 +24,13 @@
 
 /*============================ GLOBAL VARIABLES =============================*/
 
+#if (1 != CONFIG_SHELL_USE_REGISTER_MODE)
 static void shell_test_str(int argc, char *argv[]);
 static void shell_test_ch(int argc, char *argv[]);
 static void shell_test_num(int argc, char *argv[]);
 static void shell_test_float(int argc, char *argv[]);
 
-const SHELL_CMD_TYPE_ST shell_command_list[] = {
+const lsh_tbl_t shell_command_list[] = {
     {"getstr", shell_test_str, "get a string and print it"},
     {"getch", shell_test_ch, "get a char and print it"},
     {"getval", shell_test_num, "get a num and print it"},
@@ -37,6 +38,7 @@ const SHELL_CMD_TYPE_ST shell_command_list[] = {
     {"help", shell_help, "Print a list of all commands."},
     {(void *)0, (void *)0, (void *)0},
 };
+#endif
 
 /*========================== FUNCTION PROTOTYPES ============================*/
 
@@ -98,3 +100,11 @@ static void shell_test_float(int argc, char *argv[])
     num.int_val = shell_arg_parse(argv[1]);
     SHELL_LOG("shell get float { %f } \r\n", num.flt_val);
 }
+
+#if (1 == CONFIG_SHELL_USE_REGISTER_MODE)
+SHELL_CMD_REGISTER(getstr, shell_test_str, "get a string and print it");
+SHELL_CMD_REGISTER(getch, shell_test_ch, "get a char and print it");
+SHELL_CMD_REGISTER(getval, shell_test_num, "get a num and print it");
+SHELL_CMD_REGISTER(getfloat, shell_test_float, "get a float num and print it");
+SHELL_CMD_REGISTER(help, shell_help, "Print a list of all commands.");
+#endif
